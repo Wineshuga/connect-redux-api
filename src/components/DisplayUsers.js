@@ -1,16 +1,27 @@
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { getUsers,getLoading, getError, fetchUser } from '../store/users/usersSlice'
 
 const DisplayUsers = () => {
-  const { users, isLoading, error } = useSelector((store) => store.users)
+  const dispatch = useDispatch();
+  const users = useSelector(getUsers);
+  const isLoading = useSelector(getLoading)
+  const err = useSelector(getError)
+
+  useEffect(() => {
+    if (users.length === 0) {
+      dispatch(fetchUser())
+    }
+  }, [users.length, dispatch])
 
   if (isLoading) return <p>Fetching data</p>
-  if (error) return console.error(error);
+  if (err) return <p>There's a problem: ${err}</p>;
   return (
     <div>
       <ul>
         {users.map((user) => (
-          <li key={user.id}>
-            Full name: {user.first} {user.last}
+          <li key={user.login.md5}>
+            Full name: {user.name.first} {user.name.last}
           </li>
         ))}
       </ul>
